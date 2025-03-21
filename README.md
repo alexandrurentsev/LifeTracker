@@ -1,6 +1,6 @@
 Вот готовый README.md в чистом Markdown-формате:
 
-```markdown
+
 # LifeTracker - Система персональной аналитики в Obsidian
 
 ![Obsidian Version](https://img.shields.io/badge/Obsidian-1.4%2B-blueviolet)
