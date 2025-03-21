@@ -5,8 +5,9 @@
 
 Персонализированная система трекинга метрик здоровья и продуктивности с расширенной визуализацией данных.
 
-![image](https://github.com/user-attachments/assets/37c2767a-2436-482a-8e19-52d0c827d242)
-
+<div align="center">
+  <img src="image.png" alt="Пример аналитики" width="350"/>
+</div>
 
 ## Требования
 - [Obsidian](https://obsidian.md) v1.4+
