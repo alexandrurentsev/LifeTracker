@@ -1,12 +1,9 @@
-Вот готовый README.md в чистом Markdown-формате:
-
-
 # LifeTracker - Система персональной аналитики в Obsidian
 
 ![Obsidian Version](https://img.shields.io/badge/Obsidian-1.4%2B-blueviolet)
 ![Dataview Plugin](https://img.shields.io/badge/Plugin-Dataview-4B32C3)
 
-Система для трекинга персональных метрик с визуализацией данных через Obsidian и плагин Dataview.
+Персонализированная система трекинга метрик здоровья и продуктивности с расширенной визуализацией данных.
 
 ## Требования
 - [Obsidian](https://obsidian.md) v1.4+
@@ -15,130 +12,102 @@
   - [Dataview](https://github.com/blacksmithgu/obsidian-dataview) v0.5.45+
 
 ## Установка
-
-### 1. Инициализация хранилища
+1. **Создайте новое хранилище**:
 ```bash
-mkdir MyLifeTracker
-cd MyLifeTracker
+mkdir BiohackingVault
+cd BiohackingVault
 mkdir Daily
 ```
 
-### 2. Настройка Templater
-1. Установите плагин Templater через Community Plugins
-2. Создайте шаблон `Templates/DailyNote.md`:
+2. **Настройте Templater**:
+- Создайте шаблон `Templates/DailyNote.md`:
 ```markdown
 ---
 created: {{date:YYYY-MM-DD}}
 ---
 
 # {{date:YYYY-MM-DD}}
-Sleep: 
+sleep: 
 Mood: 
-Sport: 
-Cognitive: 
+sport: 
+cognitive: 
 ```
 
-3. Конфигурация Templater (`.obsidian/templater.json`):
-```json
-{
-  "template_folder": "Templates",
-  "auto_jump_to_cursor": true,
-  "date_format": "YYYY-MM-DD"
-}
-```
+3. **Добавьте файл визуализации**:
+- Создайте `Biohacking Table.md` и вставьте [приведённый код](Biohacking%20Table.md)
 
-## Структура данных
-Ежедневные заметки должны содержать метрики в формате:
+## Конфигурация данных
+
+### Формат ежедневных записей
 ```markdown
-Sleep: 7  # 1-10
+sleep: 7  # 1-10
 Mood: 8   # 1-10 
-Sport: 3   # 1-10
-Cognitive: 6  # 1-10
+sport: 3   # 1-10
+cognitive: 6  # 1-10
+```
+
+### Основные параметры (Biohacking Table.md)
+```javascript
+// Основные настройки
+const PROPERTY_FIELDS = ["sport", "Mood", "cognitive", "sleep"];
+const VAULT_NAME = "BiohackingVault"; 
+const NOTES_FOLDER = "Daily";
+const CELL_SIZE = 15; // Размер ячеек календаря
+
+// Цветовая схема
+const HUE_RED = 13;    // Красный спектр
+const HUE_GREEN = 132; // Зелёный спектр
 ```
 
 ## Визуализация данных
 
-### Calendar.md
-```dataviewjs
-const HUE_RED = 0;
-const HUE_GREEN = 120;
-const pages = dv.pages('"Daily"').where(p => p.Sleep);
+Система предоставляет три типа аналитики в одном файле:
 
-dv.span("## Sleep Calendar\n");
-dv.span("🔴 Low | 🟢 High\n\n");
+### 1. Годовой календарь активности
+- Цветовая градация от красного (низкие значения) до зелёного (высокие)
+- Интерактивные ссылки на ежедневные заметки
+- Автоматическое определение пропущенных дней
 
-for(let month = 0; month < 12; month++) {
-  const monthDays = pages.where(p => p.file.day.month === month);
-  const heatmap = [...Array(31)].map((_, i) => {
-    const day = monthDays.find(p => p.file.day.day === i+1);
-    return day ? colorBlock(day.Sleep) : "⬛";
-  });
-  dv.span(`**${month+1}:** ${heatmap.join("")}\n\n`);
-}
+### 2. Круговая диаграмма распределения
+- Категории: Отличное, Хорошее, Среднее, Плохое
+- Анимированные секции с тенями
+- Интерактивные подписи категорий
 
-function colorBlock(value) {
-  const hue = lerp(HUE_RED, HUE_GREEN, value/10);
-  return `<span style="color:hsl(${hue},100%,50%)">■</span>`;
-}
-```
-
-### PieChart.md
-```dataviewjs
-const data = {
-  "Excellent": dv.pages('"Daily"').filter(p => p.Mood >= 8).length,
-  "Good": dv.pages('"Daily"').filter(p => p.Mood >=5 && p.Mood <8).length,
-  "Poor": dv.pages('"Daily"').filter(p => p.Mood <5).length
-};
-
-new Chart(
-  dv.current().container,
-  {
-    type: 'pie',
-    data: {
-      labels: Object.keys(data),
-      datasets: [{data: Object.values(data)}]
-    }
-  }
-);
-```
-
-### YearGraph.md
-```dataviewjs
-const months = [...Array(12)].map((_,i) => 
-  dv.pages('"Daily"')
-    .filter(p => p.file.day.year == dv.current().file.day.year)
-    .filter(p => p.file.day.month == i)
-    .map(p => p.Sleep)
-);
-
-dv.span("## Monthly Sleep Trends\n");
-dv.plot(
-  months.map(m => m.length ? m.reduce((a,b)=>a+b)/m.length : 0),
-  {height: 300, width: 800}
-);
-```
+### 3. Трендовый график за год
+- Динамика средних значений по месяцам
+- Точечная визуализация с точными значениями
+- Адаптивная сетка и оси координат
 
 ## Кастомизация
-1. **Изменение метрик**:
-```dataviewjs
-dv.pages('"Daily"').filter(p => p.[YOUR_METRIC])
+
+### 1. Изменение метрик
+```javascript
+// В секции PROPERTY_FIELDS
+const PROPERTY_FIELDS = ["new_metric1", "new_metric2"]; 
 ```
 
-2. **Настройка цветов**:
+### 2. Настройка внешнего вида
 ```javascript
-// Для календаря
-const HUE_RED = 0;    // 0-360
-const HUE_GREEN = 120;
+// Размеры элементов
+const CELL_SIZE = 20;      // Календарь
+const CHART_RADIUS = 150;  // Диаграмма
+
+// Цветовые схемы
+const COLORS = ["#4caf50", "#8bc34a", "#ffc107", "#f44336"]; // Для диаграммы
+```
+
+### 3. Формулы расчётов
+```javascript
+// Логика категоризации (в секции круговой диаграммы)
+if (average >= 7) { ... } // Измените пороговые значения
 ```
 
 ## Структура проекта
 ```
-MyLifeTracker/
+BiohackingVault/
 ├── Daily/
 │   └── YYYY-MM-DD.md
 ├── Templates/
 │   └── DailyNote.md
-├── Calendar.md
-├── PieChart.md
-└── YearGraph.md
+└── Biohacking Table.md
 ```
